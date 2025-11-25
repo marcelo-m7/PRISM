@@ -50,21 +50,23 @@ export default function RootLayout({
           as="style"
           href="https://google-fonts.jialeliu.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
         />
-        <link
-          rel="stylesheet"
-          id="gfonts-css"
-          href="https://google-fonts.jialeliu.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
-          media="print"
-        />
+        {/* Insert the stylesheet client-side to avoid SSR/CSR attribute mismatch */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function(){
-                var l = document.getElementById('gfonts-css');
-                if (!l) return;
-                if (l.media !== 'all') {
-                  l.addEventListener('load', function(){ try { l.media = 'all'; } catch(e){} });
-                }
+                try {
+                  var href = 'https://google-fonts.jialeliu.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap';
+                  var existing = document.getElementById('gfonts-css');
+                  if (existing) return;
+                  var l = document.createElement('link');
+                  l.rel = 'stylesheet';
+                  l.id = 'gfonts-css';
+                  l.href = href;
+                  l.media = 'print';
+                  l.onload = function(){ try { l.media = 'all'; } catch(e){} };
+                  document.head.appendChild(l);
+                } catch (e) {}
               })();
             `,
           }}
